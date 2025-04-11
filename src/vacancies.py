@@ -1,5 +1,5 @@
-from typing import Any, Dict, List, Union, Optional
 import re
+from typing import Any, Dict, List, Optional, Union
 
 
 class Vacancy:
@@ -58,6 +58,7 @@ class Vacancy:
             Статический метод, проверка корректности экземпляра класса
             :raise TypeError: Не является классом Vacancy
     """
+
     name: str
     url: str
     salary_from: Optional[int]
@@ -107,8 +108,7 @@ class Vacancy:
         other.__valid_other(other)
         return self.salary_average() < other.salary_average()
 
-
-    def __le__(self, other) -> bool:
+    def __le__(self, other: "Vacancy") -> bool:
         """
         Магический метод сравнения "меньше или равно"
         :param other: класс для сравнения
@@ -117,7 +117,7 @@ class Vacancy:
         other.__valid_other(other)
         return self.salary_average() <= other.salary_average()
 
-    def __gt__(self, other) -> bool:
+    def __gt__(self, other: "Vacancy") -> bool:
         """
         Магический метод сравнения "больше"
         :param other: класс для сравнения
@@ -126,7 +126,7 @@ class Vacancy:
         other.__valid_other(other)
         return self.salary_average() > other.salary_average()
 
-    def __ge__(self, other) -> bool:
+    def __ge__(self, other: "Vacancy") -> bool:
         """
         Магический метод сравнения "больше или равно"
         :param other: класс для сравнения
@@ -137,13 +137,14 @@ class Vacancy:
 
     def salary_average(self) -> Union[int, float]:
         """Метод расчета средней зарплаты"""
-        if self.salary_to == 0 and self.salary_from == 0:
-            return 0
-        elif self.salary_to == 0:
-            return self.salary_from
-        elif self.salary_from == 0:
+        if self.salary_to and self.salary_from: # Есть от и до, то берем среднее
+            return (self.salary_to + self.salary_from) / 2
+        elif self.salary_to: # Если есть только до
             return self.salary_to
-        return (self.salary_to + self.salary_from) / 2
+        elif self.salary_from: # Если есть только от
+            return self.salary_from
+        else:
+            return 0
 
     @classmethod
     def created_vacancy(cls, vacancy_data: Dict[Any, Any]) -> "Vacancy":
@@ -154,22 +155,22 @@ class Vacancy:
         :return: Экземпляр класса Vacancy
         """
         name = vacancy_data.get("name", "")
-        url = vacancy_data.get("url", "")
+        url = vacancy_data.get("alternate_url", "")
 
         salary_info = vacancy_data.get("salary", {})
-        salary_from = salary_info.get("from", 0)
-        salary_to = salary_info.get("to", 0)
-
+        if salary_info is not None:
+            salary_from = salary_info.get("from", 0)
+            salary_to = salary_info.get("to", 0)
+        else:
+            salary_from = 0
+            salary_to = 0
         experience_info = vacancy_data.get("experience", {})
-        experience_name = experience_info.get("name", "")
+        if experience_info is not None:
+            experience_name = experience_info.get("name", "")
+        else:
+            experience_name = ""
 
-        return cls(
-            name=name,
-            url=url,
-            salary_from=salary_from,
-            salary_to=salary_to,
-            experience=experience_name
-        )
+        return cls(name=name, url=url, salary_from=salary_from, salary_to=salary_to, experience=experience_name)
 
     @classmethod
     def cast_to_object_list(cls, vacancy_data: List[Dict[Any, Any]]) -> List["Vacancy"]:

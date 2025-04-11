@@ -1,9 +1,10 @@
-import pytest
-from src.vacancies import Vacancy
-
 # from src.validates import
-from typing import Optional, Any
-from unittest.mock import patch, MagicMock
+from typing import Any, Optional
+from unittest.mock import MagicMock, patch
+
+import pytest
+
+from src.vacancies import Vacancy
 
 
 @patch.object(Vacancy, "_Vacancy__valid_salary_to")
@@ -64,13 +65,15 @@ def test_vacancies_init(
             100000,
             150000,
             None,
-            "Python Developer (https://hh.ru/vacancy/123456). Зарплата: от 100000 до 150000. Требуемый опыт: не указан",
+            "Python Developer (https://hh.ru/vacancy/123456). Зарплата: от 100000 до 150000. "
+            "Требуемый опыт: не указан",
         ),
         (
             100000,
             150000,
             "От 1 года до 3 лет",
-            "Python Developer (https://hh.ru/vacancy/123456). Зарплата: от 100000 до 150000. Требуемый опыт: От 1 года до 3 лет",
+            "Python Developer (https://hh.ru/vacancy/123456). Зарплата: от 100000 до 150000. "
+            "Требуемый опыт: От 1 года до 3 лет",
         ),
     ],
 )
@@ -83,12 +86,9 @@ def test_vacancy_string(salary_from: Optional[int], salary_to: Optional[int], ex
 
 
 @pytest.mark.parametrize(
-    "salary_from, salary_to, expected", [
-        (None, None, 0),
-        (100000, None, 100000),
-        (None, 150000, 150000),
-        (100000, 150000, 125000)
-    ])
+    "salary_from, salary_to, expected",
+    [(None, None, 0), (100000, None, 100000), (None, 150000, 150000), (100000, 150000, 125000)],
+)
 def test_salary_average(salary_from: int, salary_to: int, expected: int) -> None:
     """Тестирование получение средней зарплаты"""
     name = "Python Developer"
@@ -110,12 +110,12 @@ def test_created_vacancy() -> None:
     """Тестирование создания класса из словаря"""
     vacancy_dict = {
         "name": "Python Developer",
-        "url": "https://hh.ru/vacancy/123456",
+        "alternate_url": "https://hh.ru/vacancy/123456",
         "salary": {
             "from": 100000,
             "to": 150000,
         },
-        "experience": {"name": "От 1 года до 3 лет"}
+        "experience": {"name": "От 1 года до 3 лет"},
     }
     vacancy = Vacancy.created_vacancy(vacancy_dict)
     assert vacancy.name == "Python Developer"
@@ -125,32 +125,61 @@ def test_created_vacancy() -> None:
     assert vacancy.experience == "От 1 года до 3 лет"
 
 
+def test_created_vacancy_salary_null() -> None:
+    """Тестирование создания класса из словаря при отсутствии указанной зарплаты"""
+    vacancy_dict = {
+        "name": "Python Developer",
+        "alternate_url": "https://hh.ru/vacancy/123456",
+        "salary": None,
+        "experience": {"name": "От 1 года до 3 лет"},
+    }
+    vacancy = Vacancy.created_vacancy(vacancy_dict)
+    assert vacancy.salary_from == 0
+    assert vacancy.salary_to == 0
+
+
+def test_created_vacancy_experience_null() -> None:
+    """Тестирование создания класса из словаря при отсутствии указанной опыта"""
+    vacancy_dict = {
+        "name": "Python Developer",
+        "alternate_url": "https://hh.ru/vacancy/123456",
+        "salary": {
+            "from": 100000,
+            "to": 150000,
+        },
+        "experience": None,
+    }
+    vacancy = Vacancy.created_vacancy(vacancy_dict)
+    assert vacancy.experience == ""
+
+
 def test_cast_to_object_list() -> None:
     """Тестирование получение списка экземпляров класса из списка словарей"""
     vacancies = [
         {
             "name": "Python Developer",
-            "url": "https://hh.ru/vacancy/123456",
+            "alternate_url": "https://hh.ru/vacancy/123456",
             "salary": {
                 "from": 100000,
                 "to": 150000,
             },
-            "experience": {"name": "От 1 года до 3 лет"}
+            "experience": {"name": "От 1 года до 3 лет"},
         },
         {
             "name": "QA engineer",
-            "url": "https://hh.ru/vacancy/119246134",
+            "alternate_url": "https://hh.ru/vacancy/119246134",
             "salary": {
                 "from": 150000,
                 "to": 230000,
             },
-            "experience": {"name": "От 3 лет"}
+            "experience": {"name": "От 3 лет"},
         },
     ]
     test_list = Vacancy.cast_to_object_list(vacancies)
     assert len(test_list) == 2
     assert test_list[0].name == "Python Developer"
     assert test_list[1].name == "QA engineer"
+
 
 # ValidVacancy
 def test_valid_name() -> None:
