@@ -106,6 +106,18 @@ def test_comparison(vacancy_one: Vacancy, vacancy_two: Vacancy, vacancy_three: V
     assert vacancy_one >= vacancy_three
 
 
+def test_vacancy_to_dict(vacancy_one: Vacancy) -> None:
+    """Тестирование, получение словаря из экземпляра класса"""
+    expected = {
+        "name": "Python Developer",
+        "url": "https://hh.ru/vacancy/123456",
+        "salary_from": 100000,
+        "salary_to": 150000,
+        "experience": "От 1 года до 3 лет"
+    }
+    assert vacancy_one.to_dict() == expected
+
+
 def test_created_vacancy() -> None:
     """Тестирование создания класса из словаря"""
     vacancy_dict = {

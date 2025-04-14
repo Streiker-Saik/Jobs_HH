@@ -135,6 +135,20 @@ class Vacancy:
         other.__valid_other(other)
         return self.salary_average() >= other.salary_average()
 
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        Метод перевода экземпляра класса в словарь
+        :return: Словарь вакансии. Формат:
+            {"name": ..., "url": ..., "salary_from": ..., "salary_to": ..., "experience": ...}
+        """
+        return {
+            "name": self.name,
+            "url": self.url,
+            "salary_from": self.salary_from,
+            "salary_to": self.salary_to,
+            "experience": self.experience
+        }
+
     def salary_average(self) -> Union[int, float]:
         """Метод расчета средней зарплаты"""
         if self.salary_to and self.salary_from: # Есть от и до, то берем среднее
@@ -162,8 +176,8 @@ class Vacancy:
             salary_from = salary_info.get("from", 0)
             salary_to = salary_info.get("to", 0)
         else:
-            salary_from = 0
-            salary_to = 0
+            salary_from = None
+            salary_to = None
         experience_info = vacancy_data.get("experience", {})
         if experience_info is not None:
             experience_name = experience_info.get("name", "")
