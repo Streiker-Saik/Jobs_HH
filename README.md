@@ -49,6 +49,16 @@ class AbstractApi(ABC)
     get_vacancies(self, keyword) -> List[Dict[Any, Any]]:
         Метод получения вакансий 
 ```
+class AbstractJobFiles(ABC)
+```
+Абстрактный класс аботы с файлами
+    read_data(self) -> List[Dict[str, Any]]:
+        Метод получения данных из файла
+    add_data(self, data: Dict[str, Any]) -> None:
+        Метод добавления данных в файл
+    del_data(self, data: Dict[str, Any]) -> None:
+        Метод удаления данных из файла
+```
 
 ## src.exceptions.py
 class APIError(Exception)
@@ -145,8 +155,29 @@ class Vacancy
         :raise TypeError: Не является классом Vacancy
 ```
 
-## src._____.py
+## src.job_files.py
+class JSONSaver(AbstractJobFiles)
 ```
+Класс работы с JSON файлами
+
+Атрибуты:
+    file_path(str): путь к файлу
+
+Методы:
+    __init__(self, file_path: str):
+        Инициализация класса JSONSaver
+    read_data(self) -> List[Dict[str, Any]]:
+        Метод получения данных из JSON файла
+        :raise FileNotFoundError: Если файл не найден. Обходит исключение.
+            Выводит пустой список
+        :raise json.JSONDecodeError: Ошибка форматирования JSON файла. Обходит исключение.
+            Выводит пустой список
+    add_data(self, data: Dict[str, Any]) -> None:
+        Метод добавления данных в файл (добавляет, а не перезаписывает)
+    del_data(self, vacancy: Dict[str, Any]) -> None:
+        Метод удаления данных из файла
+        :raise ValueError: Вызывается, если удаляемые данные не найдены. Обходит исключение.
+            Выводит в консоль 'Вакансия не найдена'
 ```
 
 ## Тестирование:
