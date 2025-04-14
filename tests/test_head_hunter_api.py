@@ -56,7 +56,9 @@ def test_private_connect_error(mock_request: MagicMock) -> None:
     mock_request.return_value.json.return_value = expected_result
     mock_request.return_value.status_code = 400
     mock_request.return_value.text = expected_result
+
     hh_api = HeadHunterAPI()
+
     with pytest.raises(APIError, match=f"Ошибка API: 400 - {expected_result}"):
         hh_api.connect()
 
@@ -67,14 +69,28 @@ def test_private_connect_error(mock_request: MagicMock) -> None:
     )
 
 
-@patch.object(HeadHunterAPI, 'connect')
+@patch.object(HeadHunterAPI, '_HeadHunterAPI__connect')
 def test_get_vacancies(mock_response: MagicMock) -> None:
     """Тестирование метода get_vacancies"""
-    mock_response.return_value = {"items": [{'id': '123'}, {'id': '321'}]}
+    mock_response.return_value = {"items": [{'id': '123'}]}
 
-    hh_api = HeadHunterAPI(2)
-    vacancies = hh_api.get_vacancies("123")
+    hh_api = HeadHunterAPI()
+    vacancies = hh_api.get_vacancies("123", 1)
 
-    assert len(vacancies) == 2
+    assert len(vacancies) == 1
     assert vacancies[0]['id'] == '123'
-    assert vacancies[1]['id'] == '321'
+
+    mock_response.assert_called_once_with()
+
+
+@patch.object(HeadHunterAPI, '_HeadHunterAPI__connect')
+def test_get_vacancies_none_key(mock_response: MagicMock) -> None:
+    """Тестирование метода get_vacancies при отсутствии данных"""
+    mock_response.return_value = {'error': 'error message'}
+
+    hh_api = HeadHunterAPI()
+    vacancies = hh_api.get_vacancies("123", 1)
+
+    assert len(vacancies) == 0
+
+    mock_response.assert_called_once_with()

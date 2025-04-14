@@ -11,7 +11,7 @@ class HeadHunterAPI(AbstractApi):
         __headers(dict): Заголовки запроса (private);
         __params(dict): Параметры запроса (private);
         __vacancies(list): Список вакансий (private);
-        per_page(int): Количество элементов(по умолчанию и максимум 100)
+        per_page(int): Количество элементов со станицы(по умолчанию и максимум 100)
     Методы:
         __init__(self, per_page: int = 100) -> None:
             Инициализатор экземпляра класса HeadHunterAPI.
@@ -52,19 +52,23 @@ class HeadHunterAPI(AbstractApi):
         else:
             return response.json()
 
-    def get_vacancies(self, keyword: str) -> List[Dict[Any, Any]]:
+    def get_vacancies(self, keyword: str, max_per_page: int = 1000) -> List[Dict[Any, Any]]:
         """
         Метод получения вакансий
         :param keyword: Ключевое слово
+        :param max_per_page: Максимальное количество страниц (по умолчанию 1000)
         :return: Список словарей вакансий
         """
         self.__params['text'] = keyword
-        self.__params['per_page'] = self.per_page
+        self.__params['page'] = 0
         self.__vacancies.clear()
-
-        data = self.connect()["items"]
-        self.__vacancies.extend(data)
-
+        while self.__params.get('page') < max_per_page:
+            data = self.__connect()
+            vacancy = data.get("items", [])
+            if not vacancy:
+                break
+            self.__vacancies.extend(vacancy)
+            self.__params['page'] += 1  # Увеличение номера страницы
         return self.__vacancies
 
     @staticmethod
