@@ -1,8 +1,9 @@
-from typing import Tuple, List, Union
+import re
 from pathlib import Path
+from typing import List, Tuple, Union
+
 from src.job_files import JSONSaver
 from src.vacancies import Vacancy
-import re
 
 
 def user_response_top_n(numb_attempts: int = 5) -> int:
@@ -12,17 +13,18 @@ def user_response_top_n(numb_attempts: int = 5) -> int:
     :return: Положительное число
     """
     numb_count = 0
-    try:
-        while numb_count < numb_attempts:
+    while numb_count < numb_attempts:
+        try:
             top_n = int(input("Введите количество вакансий для вывода в топ N: "))
             if top_n > 0:
                 return top_n
             else:
                 numb_count += 1
                 print("Ошибка, вы ввели отрицательное число")
-    except ValueError:
-        numb_count += 1
-        print("Ошибка, введено не корректное значение")
+        except ValueError:
+            numb_count += 1
+            print("Ошибка, введено не корректное значение")
+    return 0
 
 
 def user_response_salary_range(numb_attempts: int = 5) -> Tuple[int, int]:
@@ -45,6 +47,7 @@ def user_response_salary_range(numb_attempts: int = 5) -> Tuple[int, int]:
         else:
             numb_count += 1
             print(f"Ошибка {salary_range}. Пример: 100000 - 150000")
+    return 0, 0
 
 
 def get_vacancies_by_salary(vacancies: List[Vacancy], salary_min: int, salary_max: int) -> List[Vacancy]:
@@ -94,7 +97,3 @@ def safe_json(vacancies: List[Vacancy], file_path: Union[str, Path]) -> None:
     json_saver = JSONSaver(file_path)
     for vacancy in vacancies:
         json_saver.add_data(vacancy.to_dict())
-
-
-if __name__ == '__main__':
-    user_response_salary_range()

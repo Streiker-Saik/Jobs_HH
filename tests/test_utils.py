@@ -1,14 +1,11 @@
-from unittest.mock import MagicMock, patch
-from src.utils import (
-    user_response_top_n,
-    user_response_salary_range,
-    get_top_vacancies,
-    get_vacancies_by_salary,
-    print_vacancies,
-)
-import pytest
-from src.vacancies import Vacancy
 from typing import List
+from unittest.mock import MagicMock, patch
+
+import pytest
+
+from src.utils import (get_top_vacancies, get_vacancies_by_salary, print_vacancies, user_response_salary_range,
+                       user_response_top_n)
+from src.vacancies import Vacancy
 
 
 @patch("builtins.input")
@@ -93,17 +90,14 @@ def test_print_vacancies(vacancy_list: List[Vacancy], capsys: pytest.CaptureFixt
     print_vacancies(vacancy_list)
     message = capsys.readouterr().out.strip().split("\n")
     assert (
-        message[0]
-        == "Python Developer (https://hh.ru/vacancy/123456). Зарплата: от 100000 до 150000. "
-           "Требуемый опыт: От 1 года до 3 лет"
+        message[0] == "Python Developer (https://hh.ru/vacancy/123456). Зарплата: от 100000 до 150000. "
+        "Требуемый опыт: От 1 года до 3 лет"
     )
     assert (
-        message[1]
-        == "QA engineer (https://hh.ru/vacancy/119246134). Зарплата: от 150000 до 230000. "
-           "Требуемый опыт: От 3 лет"
+        message[1] == "QA engineer (https://hh.ru/vacancy/119246134). Зарплата: от 150000 до 230000. "
+        "Требуемый опыт: От 3 лет"
     )
     assert (
-        message[2]
-        == "Тестировщик (middle QA Engineer) (https://hh.ru/vacancy/119270456). Зарплата: до 125000. "
-           "Требуемый опыт: От 1 года"
+        message[2] == "Тестировщик (middle QA Engineer) (https://hh.ru/vacancy/119270456). Зарплата: до 125000. "
+        "Требуемый опыт: От 1 года"
     )

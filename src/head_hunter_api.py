@@ -1,7 +1,11 @@
+from typing import Any, Dict, List
+
+import requests
+
 from src.exceptions import APIError
 from src.interfaces import AbstractApi
-import requests
-from typing import Any, Dict, List
+from src.vacancies import Vacancy
+
 
 class HeadHunterAPI(AbstractApi):
     """
@@ -26,6 +30,7 @@ class HeadHunterAPI(AbstractApi):
             TypeError: Если аргумент не является целым числом
             ValueError: Если аргумент равен 0 или отрицательный
     """
+
     per_page: int
 
     def __init__(self, per_page: int = 100) -> None:
@@ -34,41 +39,44 @@ class HeadHunterAPI(AbstractApi):
         :param per_page: Количество страниц вакансий (по умолчанию 100)
         """
         self.__url = "https://api.hh.ru/vacancies"
-        self.__headers = {'User-Agent': 'HH-User-Agent'}
+        self.__headers = {"User-Agent": "HH-User-Agent"}
         self.per_page = self.__valid_per_page(per_page)
-        self.__params = {'text': '', 'page': 0, 'per_page': self.per_page}
-        self.__vacancies = []
+        self.__params: Dict[str, Any] = {"text": "", "page": 0, "per_page": self.per_page}
+        self.__vacancies: List[Dict[str, Any]] = []
 
     def connect(self) -> Dict[Any, Any]:
         """Метод подключения к API"""
         return self.__connect()
 
-    def __connect(self) -> Dict[Any, Any]:
+    def __connect(self) -> Dict[str, Any]:
         """Приватный метод подключения к Head_Hunter_API"""
         response = requests.get(self.__url, headers=self.__headers, params=self.__params)
         if response.status_code != 200:
             error_message = f"Ошибка API: {response.status_code} - {response.text}"
             raise APIError(error_message)
         else:
-            return response.json()
+            result = response.json()
+            if isinstance(result, Dict):
+                return dict(result)
+            return result
 
-    def get_vacancies(self, keyword: str, max_per_page: int = 1000) -> List[Dict[Any, Any]]:
+    def get_vacancies(self, keyword: str, max_per_page: int = 1000) -> List[Dict[str, Any]]:
         """
         Метод получения вакансий
         :param keyword: Ключевое слово
         :param max_per_page: Максимальное количество страниц (по умолчанию 1000)
         :return: Список словарей вакансий
         """
-        self.__params['text'] = keyword
-        self.__params['page'] = 0
+        self.__params["text"] = keyword
+        self.__params["page"] = 0
         self.__vacancies.clear()
-        while self.__params.get('page') < max_per_page:
+        while self.__params.get("page") < max_per_page:
             data = self.__connect()
             vacancy = data.get("items", [])
             if not vacancy:
                 break
             self.__vacancies.extend(vacancy)
-            self.__params['page'] += 1  # Увеличение номера страницы
+            self.__params["page"] += 1  # Увеличение номера страницы
         return self.__vacancies
 
     @staticmethod

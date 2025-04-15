@@ -113,7 +113,7 @@ def test_vacancy_to_dict(vacancy_one: Vacancy) -> None:
         "url": "https://hh.ru/vacancy/123456",
         "salary_from": 100000,
         "salary_to": 150000,
-        "experience": "От 1 года до 3 лет"
+        "experience": "От 1 года до 3 лет",
     }
     assert vacancy_one.to_dict() == expected
 

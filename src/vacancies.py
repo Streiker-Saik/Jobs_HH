@@ -146,16 +146,19 @@ class Vacancy:
             "url": self.url,
             "salary_from": self.salary_from,
             "salary_to": self.salary_to,
-            "experience": self.experience
+            "experience": self.experience,
         }
 
     def salary_average(self) -> Union[int, float]:
         """Метод расчета средней зарплаты"""
-        if self.salary_to and self.salary_from: # Есть от и до, то берем среднее
+        # Есть от и до, то берем среднее
+        if self.salary_to and self.salary_from:
             return (self.salary_to + self.salary_from) / 2
-        elif self.salary_to: # Если есть только до
+        # Если есть только до
+        elif self.salary_to:
             return self.salary_to
-        elif self.salary_from: # Если есть только от
+        # Если есть только от
+        elif self.salary_from:
             return self.salary_from
         else:
             return 0
