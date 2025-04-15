@@ -56,9 +56,10 @@ class HeadHunterAPI(AbstractApi):
             raise APIError(error_message)
         else:
             result = response.json()
-            if isinstance(result, Dict):
-                return dict(result)
-            return result
+            if not isinstance(result, Dict):
+                raise ValueError("API выдает не словарь")
+            return dict(result)
+
 
     def get_vacancies(self, keyword: str, max_per_page: int = 1000) -> List[Dict[str, Any]]:
         """

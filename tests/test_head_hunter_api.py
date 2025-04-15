@@ -56,6 +56,18 @@ def test_private_connect(mock_request: MagicMock) -> None:
 
 
 @patch("requests.get")
+def test_private_connect_invalid(mock_request: MagicMock) -> None:
+    """Тестирование, работы приватного запроса API, если выдается не словарь"""
+    with pytest.raises(ValueError) as exc_info:
+        expected_result = "Error"
+        mock_request.return_value.result = expected_result
+        mock_request.return_value.status_code = 200
+        hh_api = HeadHunterAPI()
+        hh_api.connect()
+    assert str(exc_info.value) == "API выдает не словарь"
+
+
+@patch("requests.get")
 def test_private_connect_error(mock_request: MagicMock) -> None:
     """Тестирование, работы приватного запроса API с ошибкой статуса"""
     expected_result = "Параметры переданы с ошибкой"
