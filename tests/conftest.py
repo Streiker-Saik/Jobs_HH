@@ -1,5 +1,5 @@
 import os
-from typing import Generator
+from typing import Generator, List
 
 import pytest
 
@@ -37,6 +37,11 @@ def vacancy_three() -> Vacancy:
         salary_to=125000,
         experience="От 1 года",
     )
+
+
+@pytest.fixture
+def vacancy_list(vacancy_one: Vacancy, vacancy_two: Vacancy, vacancy_three: Vacancy) -> List[Vacancy]:
+    return [vacancy_one, vacancy_two, vacancy_three]
 
 
 @pytest.fixture
