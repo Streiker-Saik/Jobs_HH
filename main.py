@@ -1,3 +1,5 @@
+import json
+
 from src.head_hunter_api import HeadHunterAPI
 from src.settings import BASE_DIR
 from src.utils import (get_top_vacancies, get_vacancies_by_salary, print_vacancies, safe_json,
@@ -30,3 +32,5 @@ def user_interaction() -> None:
 
 if __name__ == "__main__":
     user_interaction()
+    with open(file_path):
+        json.loads()

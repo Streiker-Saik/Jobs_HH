@@ -60,7 +60,6 @@ class HeadHunterAPI(AbstractApi):
                 raise ValueError("API выдает не словарь")
             return dict(result)
 
-
     def get_vacancies(self, keyword: str, max_per_page: int = 1000) -> List[Dict[str, Any]]:
         """
         Метод получения вакансий
