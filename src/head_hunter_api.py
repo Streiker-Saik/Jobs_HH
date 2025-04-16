@@ -23,6 +23,8 @@ class HeadHunterAPI(AbstractApi):
             Метод подключения к API
         __connect(self) -> Dict[Any, Any]:
             Приватный метод подключения к Head_Hunter_API
+            :raise APIError: Ошибка запроса API
+            :raise ValueError: Если API выдает не словарь
         get_vacancies(self, keyword: str) -> List[Dict[Any, Any]]:
             Метод получения вакансий
         __valid_per_page(per_page: int) -> int:
@@ -49,7 +51,12 @@ class HeadHunterAPI(AbstractApi):
         return self.__connect()
 
     def __connect(self) -> Dict[str, Any]:
-        """Приватный метод подключения к Head_Hunter_API"""
+        """
+        Приватный метод подключения к Head_Hunter_API
+        :return: Словарь ответа от API
+        :raise APIError: Ошибка запроса API
+        :raise ValueError: Если API выдает не словарь
+        """
         response = requests.get(self.__url, headers=self.__headers, params=self.__params)
         if response.status_code != 200:
             error_message = f"Ошибка API: {response.status_code} - {response.text}"

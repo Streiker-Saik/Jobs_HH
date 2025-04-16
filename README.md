@@ -224,7 +224,7 @@ vacancy_two - не входит в диапозон
 vacancy_three - входит в диапозон
 [vacancy_one, vacancy_three]
 ```
-# get_top_vacancies
+get_top_vacancies
 Функция получения топ-'n' вакансий из списка
 - принимает: 
 - - Список экземпляров класса Vacancy
@@ -236,7 +236,7 @@ get_top_vacancies(vacancy_list, 2)
 >>>
 [vacancy_two, vacancy_one]
 ```
-# print_vacancies
+print_vacancies
 Функция вывода в консоль вакансий
 - принимает: Список экземпляров класса Vacancy
 ```
@@ -246,7 +246,7 @@ Python Developer (https://hh.ru/vacancy/123456). Зарплата: от 100000 �
 QA engineer (https://hh.ru/vacancy/119246134). Зарплата: от 150000 до 230000. Требуемый опыт: От 3 лет
 Тестировщик (middle QA Engineer) (https://hh.ru/vacancy/119270456). Зарплата: до 125000. Требуемый опыт: От 1 года"
 ```
-# safe_json
+safe_json
 Функция записи экземпляров класса в JSON файл
 - принимает: 
 - - Список экземпляров класса Vacancy
@@ -260,6 +260,46 @@ safe_json(vacancy_list, file_path)
         "name": Python Developer
     }, ...
 ]
+```
+## src.twelve_dat_api.py
+class AbsTwelveDataApi(ABC)
+```
+Интерфейс работы с TwelveData_API
+Методы
+    connect(self) -> Dict[str, Any]:
+        Метод подключения к API
+```
+class TwelveDataAPIExchangeRate(AbsTwelveDataApi)
+```
+Класс работы с TwelveData_API_ExchangeRate
+    Атрибуты:
+        __api_key(str) Ключ для API
+        __currency(str) Код валюты
+    Методы:
+        __init__(self, __api_key: str) -> None:
+            Инициализация класс TwelveData
+            :raise ValueError: Если ключ пустой
+        connect(self) -> Dict[str, Any]:
+            Метод подключения к API
+        __connect(self) -> Dict[str, Any]:
+            Приватный метод подключения к Twelve_Data_Api
+            :raise APIError: Ошибка запроса API
+            :raise ValueError: Если API выдает не словарь
+        get_rate(self, currency_from: str, currency_to: str) -> float:
+            Метод получения стоимости валюты
+            :raise ValueError: Курс валюты не найдет в API
+            :raise TypeError: Стоимость не является числом
+```
+class CurrencyConversion
+```
+Класс конвертации валюты
+Атрибуты:
+    api_client(TwelveDataApi): Класс подключения к API
+Методы:
+    __init__(self, api_client: TwelveDataApi) -> None:
+        Инициализация класс CurrencyConversion
+    conversion_in_rub(self, currency_from: str, currency_to: str, amount: int) -> float:
+        Метод конвертации валюты
 ```
 
 ## Тестирование:
