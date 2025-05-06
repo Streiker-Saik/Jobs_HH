@@ -33,7 +33,7 @@ cd "ваш-репозиторий"
 ```
 - Установите необходимые зависимости:
 ```bash
-poetry add pip requests
+poetry add pip requests psycopg2
 poetry add --group lint flake8 black isort mypy types-requests
 poetry add --group dev pytest pytest-cov
 ```
@@ -325,13 +325,11 @@ safe_json(vacancy_list, file_path)
     }, ...
 ]
 ```
-## src.twelve_dat_api.py
-class AbsTwelveDataApi(ABC)
+
+## src.database.py
+class DBManager
 ```
-Интерфейс работы с TwelveData_API
-Методы
-    connect(self) -> Dict[str, Any]:
-        Метод подключения к API
+
 ```
 
 
