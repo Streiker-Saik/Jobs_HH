@@ -1,26 +1,9 @@
-import os
-from abc import ABC, abstractmethod
 from typing import Any, Dict, Union
 
 import requests
-from dotenv import load_dotenv
 
 from src.exceptions import APIError
-from src.settings import BASE_DIR
-
-
-class AbsTwelveDataApi(ABC):
-    """
-    Интерфейс работы с TwelveData_API
-    Методы:
-        connect(self) -> Dict[str, Any]:
-            Метод подключения к API
-    """
-
-    @abstractmethod
-    def connect(self) -> Dict[str, Any]:
-        """Метод подключения к API"""
-        pass
+from src.interfaces import AbsTwelveDataApi
 
 
 class TwelveDataApiExchangeRate(AbsTwelveDataApi):
@@ -137,12 +120,3 @@ class CurrencyConversion:
         currency_price = self.api_client.get_rate(currency_from, currency_to)
         result = round(amount * currency_price, 2)
         return result
-
-
-if __name__ == "__main__":
-    load_dotenv(BASE_DIR / ".env")
-    api_key = os.getenv("API_TWELVEDATA_KEY")
-    api_data = TwelveDataApiExchangeRate(api_key)
-    conversion = CurrencyConversion(api_data)
-    amount_in_rub = conversion.conversion_in_rub("USD", "RUB", 100)
-    print(amount_in_rub)
