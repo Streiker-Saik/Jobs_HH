@@ -129,6 +129,17 @@ class TwelveDataApiExchangeRate(AbsTwelveDataApi):
         :raise ValueError: Курс валюты не найдет в API
         :raise TypeError: Стоимость не является числом
 ```
+class CurrencyConversion
+```
+Класс конвертации валюты
+Атрибуты:
+    api_client(TwelveDataApi): Класс подключения к API
+Методы:
+    __init__(self, api_client: TwelveDataApi) -> None:
+        Инициализация класс CurrencyConversion
+    conversion_in_rub(self, currency_from: str, currency_to: str, amount: int) -> float:
+        Метод конвертации валюты
+```
 
 ## src.vacancies.py
 class Vacancy
@@ -322,38 +333,7 @@ class AbsTwelveDataApi(ABC)
     connect(self) -> Dict[str, Any]:
         Метод подключения к API
 ```
-class TwelveDataAPIExchangeRate(AbsTwelveDataApi)
-```
-Класс работы с TwelveData_API_ExchangeRate
-    Атрибуты:
-        __api_key(str) Ключ для API
-        __currency(str) Код валюты
-    Методы:
-        __init__(self, __api_key: str) -> None:
-            Инициализация класс TwelveData
-            :raise ValueError: Если ключ пустой
-        connect(self) -> Dict[str, Any]:
-            Метод подключения к API
-        __connect(self) -> Dict[str, Any]:
-            Приватный метод подключения к Twelve_Data_Api
-            :raise APIError: Ошибка запроса API
-            :raise ValueError: Если API выдает не словарь
-        get_rate(self, currency_from: str, currency_to: str) -> float:
-            Метод получения стоимости валюты
-            :raise ValueError: Курс валюты не найдет в API
-            :raise TypeError: Стоимость не является числом
-```
-class CurrencyConversion
-```
-Класс конвертации валюты
-Атрибуты:
-    api_client(TwelveDataApi): Класс подключения к API
-Методы:
-    __init__(self, api_client: TwelveDataApi) -> None:
-        Инициализация класс CurrencyConversion
-    conversion_in_rub(self, currency_from: str, currency_to: str, amount: int) -> float:
-        Метод конвертации валюты
-```
+
 
 ## Тестирование:
 Этот проект использует pytest для тестирования. Чтобы запустить тесты, выполните следующие шаги:
