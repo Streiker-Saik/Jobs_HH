@@ -1,5 +1,6 @@
-import re
 from typing import Any, Dict, List, Optional, Union
+
+from src.validates import Valid, ValidVacancy
 
 
 class Vacancy:
@@ -38,22 +39,6 @@ class Vacancy:
             Классовый метод создание экземпляра класса из словаря.
         cast_to_object_list(cls, vacancy_data: List[Dict[Any, Any]]) -> List["Vacancy"]:
             Классовый метод создание списка экземпляров класса из списка словарей
-        __valid_name(name: str) -> str:
-            Статический метод, проверка корректности наименования вакансии
-            :raise TypeError: Название не является строкой
-            :raise ValueError: Название вакансии не бывает с 1 символом
-        __valid_url(url: str) -> str:
-            Статический метод, проверка корректности ссылки
-            :raise TypeError: Ссылка не является строкой
-            :raise ValueError: Ссылка не подходит под формат
-        __valid_salary_from(salary_from: Optional[int] = None) -> int:
-            Проверка корректности зарплаты 'от'
-            :raise TypeError: Зарплата 'от' не является числом
-            :raise ValueError: Зарплата 'от' не может быть отрицательным числом
-        __valid_salary_to(salary_to: Optional[int], salary_from: int) -> int:
-            Проверка корректности зарплаты 'до'
-            :raise TypeError: Зарплата 'до' не является числом
-            :raise ValueError: Зарплата 'до' не может быть отрицательным числом или меньше зарплаты 'от'
         __valid_class(other: "Vacancy") -> "Vacancy":
             Статический метод, проверка корректности экземпляра класса
             :raise TypeError: Не является классом Vacancy
@@ -73,13 +58,16 @@ class Vacancy:
         salary_from: Optional[int] = None,
         salary_to: Optional[int] = None,
         experience: str = "",
+        validate: Optional[Valid] = None,
     ) -> None:
         """Инициализация класса Vacancy"""
-
-        self.name = self.__valid_name(name)
-        self.url = self.__valid_url(url)
-        self.salary_from = self.__valid_salary_from(salary_from)
-        self.salary_to = self.__valid_salary_to(salary_to, self.salary_from)
+        if validate is None:
+            validate = ValidVacancy()
+        validate_data = validate.validate_vacancy_to_dict(name, url, salary_from, salary_to)
+        self.name = validate_data["name"]
+        self.url = validate_data["url"]
+        self.salary_from = validate_data["salary_from"]
+        self.salary_to = validate_data["salary_to"]
         self.experience = experience
 
     def __str__(self) -> str:
@@ -175,7 +163,7 @@ class Vacancy:
         url = vacancy_data.get("alternate_url", "")
 
         salary_info = vacancy_data.get("salary", {})
-        if salary_info is not None:
+        if salary_info is not None and salary_info.get("currency") == "RUR":
             salary_from = salary_info.get("from", 0)
             salary_to = salary_info.get("to", 0)
         else:
@@ -200,71 +188,6 @@ class Vacancy:
         for vacancy in vacancy_data:
             result.append(cls.created_vacancy(vacancy))
         return result
-
-    @staticmethod
-    def __valid_name(name: str) -> str:
-        """
-        Проверка корректности наименования вакансии
-        :param name: Наименования вакансии
-        :return: Наименования вакансии
-        :raise TypeError: Название не является строкой
-        :raise ValueError: Название вакансии не бывает с 1 символом
-        """
-        if not isinstance(name, str):
-            raise TypeError("Название не является строкой")
-        if len(name) <= 1:
-            raise ValueError("Название вакансии не бывает с 1 символом")
-        return name
-
-    @staticmethod
-    def __valid_url(url: str) -> str:
-        """
-        Проверка корректности ссылки
-        :param url: Строка ссылки
-        :return: Строка ссылки
-        :raise TypeError: Ссылка не является строкой
-        :raise ValueError: Ссылка не подходит под формат
-        """
-        if not isinstance(url, str):
-            raise TypeError("Ссылка не является строкой")
-        if not re.fullmatch(r"^(https?://)?hh\.ru/vacancy/\d+$", url):
-            raise ValueError("Ссылка не подходит под формат")
-        return url
-
-    @staticmethod
-    def __valid_salary_from(salary_from: Optional[int] = None) -> int:
-        """
-        Проверка корректности зарплаты 'от'
-        :param salary_from: Зарплата 'от'
-        :return: Зарплата 'от'
-        :raise TypeError: Зарплата 'от' не является числом
-        :raise ValueError: Зарплата 'от' не может быть отрицательным числом
-        """
-        if salary_from is None:
-            return 0
-        if not isinstance(salary_from, int):
-            raise TypeError("Зарплата 'от' не является числом")
-        if salary_from < 0:
-            raise ValueError("Зарплата 'от' не может быть отрицательным числом")
-        return salary_from
-
-    @staticmethod
-    def __valid_salary_to(salary_to: Optional[int], salary_from: int) -> int:
-        """
-        Проверка корректности зарплаты 'до'
-        :param salary_to: Зарплата 'до'
-        :param salary_from: Зарплата 'от'
-        :return: Зарплата 'до'
-        :raise TypeError: Зарплата 'до' не является числом
-        :raise ValueError: Зарплата 'до' не может быть отрицательным числом или меньше зарплаты 'от'
-        """
-        if salary_to is None:
-            return 0
-        if not isinstance(salary_to, int):
-            raise TypeError("Зарплата 'до' не является числом")
-        if salary_to < 0 or salary_to < salary_from:
-            raise ValueError("Зарплата 'до' не может быть отрицательным числом или меньше зарплаты 'от'")
-        return salary_to
 
     @staticmethod
     def __valid_other(class_date: "Vacancy") -> "Vacancy":

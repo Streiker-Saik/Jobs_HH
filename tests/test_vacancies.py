@@ -1,19 +1,14 @@
-# from src.validates import
-from typing import Any, Optional
+from typing import Optional
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from src.vacancies import Vacancy
+from src.validates import ValidVacancy
 
 
-@patch.object(Vacancy, "_Vacancy__valid_salary_to")
-@patch.object(Vacancy, "_Vacancy__valid_salary_from")
-@patch.object(Vacancy, "_Vacancy__valid_url")
-@patch.object(Vacancy, "_Vacancy__valid_name")
-def test_vacancies_init(
-    mock_name: MagicMock, mock_url: MagicMock, mock_salary_from: MagicMock, mock_salary_to: MagicMock
-) -> None:
+@patch.object(ValidVacancy, "validate_vacancy_to_dict")
+def test_vacancies_init(mock_valid: MagicMock) -> None:
     """Тестирование инициализации класса"""
     name = "Python Developer"
     url = "https://hh.ru/vacancy/123456"
@@ -21,10 +16,7 @@ def test_vacancies_init(
     salary_to = 150000
     experience = "От 1 года до 3 лет"
 
-    mock_name.return_value = name
-    mock_url.return_value = url
-    mock_salary_from.return_value = salary_from
-    mock_salary_to.return_value = salary_to
+    mock_valid.return_value = {"name": name, "url": url, "salary_from": salary_from, "salary_to": salary_to}
     vacancy = Vacancy(name, url, salary_from, salary_to, experience)
 
     assert vacancy.name == name
@@ -33,11 +25,8 @@ def test_vacancies_init(
     assert vacancy.salary_to == salary_to
     assert vacancy.experience == experience
 
-    # Проверка, что все моки были вызваны ровно один раз
-    mock_name.assert_called_once_with(name)
-    mock_url.assert_called_once_with(url)
-    mock_salary_from.assert_called_once_with(salary_from)
-    mock_salary_to.assert_called_once_with(salary_to, salary_from)
+    # Проверка, что все мок был вызван ровно один раз
+    mock_valid.assert_called_once_with(name, url, salary_from, salary_to)
 
 
 @pytest.mark.parametrize(
@@ -123,10 +112,7 @@ def test_created_vacancy() -> None:
     vacancy_dict = {
         "name": "Python Developer",
         "alternate_url": "https://hh.ru/vacancy/123456",
-        "salary": {
-            "from": 100000,
-            "to": 150000,
-        },
+        "salary": {"from": 100000, "to": 150000, "currency": "RUR"},
         "experience": {"name": "От 1 года до 3 лет"},
     }
     vacancy = Vacancy.created_vacancy(vacancy_dict)
@@ -191,99 +177,6 @@ def test_cast_to_object_list() -> None:
     assert len(test_list) == 2
     assert test_list[0].name == "Python Developer"
     assert test_list[1].name == "QA engineer"
-
-
-# ValidVacancy
-def test_valid_name() -> None:
-    """Тестирование валидации 'наименования вакансии'"""
-    name = "Python Developer"
-    result = Vacancy._Vacancy__valid_name(name)  # type: ignore
-    assert result == name
-
-
-@pytest.mark.parametrize(
-    "name, expected, exc_message",
-    [
-        (1, TypeError, "Название не является строкой"),
-        ("Q", ValueError, "Название вакансии не бывает с 1 символом"),
-    ],
-)
-def test_valid_name_error_type(name: Any, expected: type[Exception], exc_message: str) -> None:
-    """Тестирование валидации 'наименования вакансии' с ошибкой"""
-    with pytest.raises(expected) as exc_info:
-        Vacancy._Vacancy__valid_name(name)  # type: ignore
-    assert exc_message == str(exc_info.value)
-
-
-@pytest.mark.parametrize(
-    "url, expected",
-    [
-        ("https://hh.ru/vacancy/123456", "https://hh.ru/vacancy/123456"),
-        ("http://hh.ru/vacancy/123456", "http://hh.ru/vacancy/123456"),
-        ("hh.ru/vacancy/123456", "hh.ru/vacancy/123456"),
-    ],
-)
-def test_valid_url(url: str, expected: str) -> None:
-    """Тестирование валидации 'ссылки'"""
-    result = Vacancy._Vacancy__valid_url(url)  # type: ignore
-    assert result == expected
-
-
-@pytest.mark.parametrize(
-    "url, expected, exc_message",
-    [
-        (1, TypeError, "Ссылка не является строкой"),
-        ("https://hh.ru/vacancy/", ValueError, "Ссылка не подходит под формат"),
-    ],
-)
-def test_valid_url_error(url: Any, expected: type[Exception], exc_message: str) -> None:
-    """Тестирование валидации 'наименования вакансии' с ошибкой"""
-    with pytest.raises(expected) as exc_info:
-        Vacancy._Vacancy__valid_url(url)  # type: ignore
-    assert exc_message == str(exc_info.value)
-
-
-@pytest.mark.parametrize("salary_from, expected", [(100000, 100000), (None, 0)])
-def test_valid_salary_from(salary_from: Optional[int], expected: str) -> None:
-    """Тестирование валидации 'зарплаты <от>'"""
-    result = Vacancy._Vacancy__valid_salary_from(salary_from)  # type: ignore
-    assert result == expected
-
-
-@pytest.mark.parametrize(
-    "salary_from, expected, exc_message",
-    [
-        ("100000", TypeError, "Зарплата 'от' не является числом"),
-        (-100000, ValueError, "Зарплата 'от' не может быть отрицательным числом"),
-    ],
-)
-def test_valid_salary_from_error(salary_from: Any, expected: type[Exception], exc_message: str) -> None:
-    """Тестирование валидации 'зарплаты <от>' с ошибкой"""
-    with pytest.raises(expected) as exc_info:
-        Vacancy._Vacancy__valid_salary_from(salary_from)  # type: ignore
-    assert exc_message == str(exc_info.value)
-
-
-@pytest.mark.parametrize("salary_to, salary_from, expected", [(150000, 100000, 150000), (None, 100000, 0)])
-def test_valid_salary_to(salary_to: Optional[int], salary_from: int, expected: str) -> None:
-    """Тестирование валидации 'зарплаты <до>'"""
-    result = Vacancy._Vacancy__valid_salary_to(salary_to, salary_from)  # type: ignore
-    assert result == expected
-
-
-@pytest.mark.parametrize(
-    "salary_to, salary_from, expected, exc_message",
-    [
-        ("150000", 100000, TypeError, "Зарплата 'до' не является числом"),
-        (-150000, 100000, ValueError, "Зарплата 'до' не может быть отрицательным числом или меньше зарплаты 'от'"),
-        (50000, 100000, ValueError, "Зарплата 'до' не может быть отрицательным числом или меньше зарплаты 'от'"),
-    ],
-)
-def test_valid_salary_to_error(salary_to: Any, salary_from: int, expected: type[Exception], exc_message: str) -> None:
-    """Тестирование валидации 'зарплаты <до>' с ошибкой"""
-    with pytest.raises(expected) as exc_info:
-        Vacancy._Vacancy__valid_salary_to(salary_to, salary_from)  # type: ignore
-    assert exc_message == str(exc_info.value)
 
 
 def test__valid_other(vacancy_one: Vacancy) -> None:
