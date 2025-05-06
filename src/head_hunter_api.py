@@ -4,7 +4,6 @@ import requests
 
 from src.exceptions import APIError
 from src.interfaces import AbstractApi
-from src.vacancies import Vacancy
 
 
 class HeadHunterAPI(AbstractApi):
@@ -67,18 +66,18 @@ class HeadHunterAPI(AbstractApi):
                 raise ValueError("API выдает не словарь")
             return dict(result)
 
-    def get_vacancies(self, keyword: str, max_per_page: int = 1000) -> List[Dict[str, Any]]:
+    def get_vacancies(self, keyword: str, max_per_page: int = 20) -> List[Dict[str, Any]]:
         """
         Метод получения вакансий
         :param keyword: Ключевое слово
-        :param max_per_page: Максимальное количество страниц (по умолчанию 1000)
+        :param max_per_page: Максимальное количество страниц (по умолчанию 20)
         :return: Список словарей вакансий
         """
         self.__params["text"] = keyword
         self.__params["page"] = 0
         self.__vacancies.clear()
-        while self.__params.get("page") < max_per_page:
-            data = self.__connect()
+        while self.__params.get("page", 0) < max_per_page:
+            data = self.connect()
             vacancy = data.get("items", [])
             if not vacancy:
                 break

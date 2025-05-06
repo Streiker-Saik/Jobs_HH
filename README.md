@@ -59,6 +59,20 @@ class AbstractJobFiles(ABC)
     del_data(self, data: Dict[str, Any]) -> None:
         Метод удаления данных из файла
 ```
+class Valid(ABC):
+```
+Абстрактный класс валидации
+    validate_vacancy_to_dict(self, *args, **kwargs) -> Dict[str, Any]:
+        Метод получения валидные данных вакансии выводит в виде словаря
+```
+class AbsTwelveDataApi(ABC)
+```
+Абстрактный класс интерфейса работы с TwelveData_API
+    connect(self) -> Dict[str, Any]:
+        Метод подключения к API
+    get_rate(self, currency_from: str, currency_to: str) -> Union[int, float]:
+        Метод получения стоимости валюты
+```
 
 ## src.exceptions.py
 class APIError(Exception)
@@ -92,6 +106,28 @@ class HeadHunterAPI(AbstractApi):
         Статический метод проверки корректности аргумента
         TypeError: Если аргумент не является целым числом
         ValueError: Если аргумент равен 0 или отрицательный
+```
+## src.twelve_data_api.py
+class TwelveDataApiExchangeRate(AbsTwelveDataApi):
+```
+Класс работы с TwelveData_API_ExchangeRate
+
+Атрибуты:
+    __api_key(str) Ключ для API
+Методы:
+    __init__(self, __api_key: str) -> None:
+        Инициализация класс TwelveData
+        :raise ValueError: Если ключ пустой
+    connect(self) -> Dict[str, Any]:
+        Метод подключения к API
+    __connect(self) -> Dict[str, Any]:
+        Приватный метод подключения к Twelve_Data_Api
+        :raise APIError: Ошибка запроса API
+        :raise ValueError: Если API выдает не словарь
+    get_rate(self, currency_from: str, currency_to: str) -> float:
+        Метод получения стоимости валюты
+        :raise ValueError: Курс валюты не найдет в API
+        :raise TypeError: Стоимость не является числом
 ```
 
 ## src.vacancies.py
@@ -134,25 +170,42 @@ class Vacancy
         Классовый метод создание экземпляра класса из словаря.
     cast_to_object_list(cls, vacancy_data: List[Dict[Any, Any]]) -> List["Vacancy"]:
         Классовый метод создание списка экземпляров класса из списка словарей
+```
+
+## src.validates.py
+class ValidVacancy(Valid)
+```
+Класс валидации аргументов вакансии
+
+Методы:
+    validate_vacancy_to_dict(
+        self, name: str, url: str, salary_from: Optional[int], salary_to: Optional[int]
+    ) -> Dict[str, Any]:
+        Метод получения валидные данных вакансии выводит в виде словаря
+    valid_name(self, name: str) -> str:
+        Getter получения валидного наименования вакансии
+    valid_url(self, url: str) -> str:
+        Getter получения валидной ссылки
+    valid_salary_from(self, salary_from: Optional[int] = None) -> int:
+        Getter получения валидной зарплаты 'от'
+    valid_salary_to(self, salary_to: Optional[int], salary_from: int) -> int:
+        Getter получения валидной зарплаты 'до'
     __valid_name(name: str) -> str:
-        (private) Статический метод, проверка корректности наименования вакансии
+        Статический метод, проверка корректности наименования вакансии
         :raise TypeError: Название не является строкой
         :raise ValueError: Название вакансии не бывает с 1 символом
     __valid_url(url: str) -> str:
-        (private) Статический метод, проверка корректности ссылки
+        Статический метод, проверка корректности ссылки
         :raise TypeError: Ссылка не является строкой
         :raise ValueError: Ссылка не подходит под формат
     __valid_salary_from(salary_from: Optional[int] = None) -> int:
-        (private) Проверка корректности зарплаты 'от'
+        Проверка корректности зарплаты 'от'
         :raise TypeError: Зарплата 'от' не является числом
         :raise ValueError: Зарплата 'от' не может быть отрицательным числом
     __valid_salary_to(salary_to: Optional[int], salary_from: int) -> int:
-        (private) Проверка корректности зарплаты 'до'
+        Проверка корректности зарплаты 'до'
         :raise TypeError: Зарплата 'до' не является числом
         :raise ValueError: Зарплата 'до' не может быть отрицательным числом или меньше зарплаты 'от'
-    __valid_class(other: "Vacancy") -> "Vacancy":
-        (private) Статический метод, проверка корректности экземпляра класса
-        :raise TypeError: Не является классом Vacancy
 ```
 
 ## src.job_files.py

@@ -1,6 +1,6 @@
-from typing import Any
+from typing import Any, Dict
 from unittest.mock import MagicMock, patch
-from typing import Dict, Any
+
 import pytest
 
 from src.exceptions import APIError
@@ -33,7 +33,7 @@ def test_invalid_per_page(attribute: Any, expected: type[Exception], exc_message
 @patch.object(HeadHunterAPI, "_HeadHunterAPI__connect")
 def test_connect(mock_connect: MagicMock) -> None:
     """Тестирование, работы запроса API"""
-    expected_result: Dict[str, Any]  = {}
+    expected_result: Dict[str, Any] = {}
     mock_connect.return_value = expected_result
     hh_api = HeadHunterAPI()
     assert hh_api.connect() == expected_result

@@ -1,4 +1,4 @@
-import json
+
 
 from src.head_hunter_api import HeadHunterAPI
 from src.settings import BASE_DIR
@@ -32,5 +32,4 @@ def user_interaction() -> None:
 
 if __name__ == "__main__":
     user_interaction()
-    with open(file_path):
-        json.loads()
+

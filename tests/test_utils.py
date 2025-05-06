@@ -1,12 +1,12 @@
+import json
+from pathlib import Path
 from typing import List
 from unittest.mock import MagicMock, patch
-from pathlib import Path
-import json
 
 import pytest
 
-from src.utils import (get_top_vacancies, get_vacancies_by_salary, print_vacancies, user_response_salary_range,
-                       user_response_top_n, safe_json)
+from src.utils import (get_top_vacancies, get_vacancies_by_salary, print_vacancies, safe_json,
+                       user_response_salary_range, user_response_top_n)
 from src.vacancies import Vacancy
 
 
@@ -106,7 +106,7 @@ def test_print_vacancies(vacancy_list: List[Vacancy], capsys: pytest.CaptureFixt
 
 
 def test_safe_json(vacancy_list: List[Vacancy], json_file: str | Path) -> None:
-    """Тестирование функции создания JSON файла из """
+    """Тестирование функции создания JSON файла из"""
     safe_json(vacancy_list, json_file)
     with open(json_file, "r", encoding="utf-8") as file_json:
         data = json.load(file_json)
@@ -115,5 +115,5 @@ def test_safe_json(vacancy_list: List[Vacancy], json_file: str | Path) -> None:
         "url": "https://hh.ru/vacancy/123456",
         "salary_from": 100000,
         "salary_to": 150000,
-        "experience": "От 1 года до 3 лет"
+        "experience": "От 1 года до 3 лет",
     }
