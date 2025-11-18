@@ -25,7 +25,7 @@ poetry --version
 ## Установка:
 - Клонируйте репозиторий:
 ```bash
-git clone git@github.com:Streiker-Saik/CourseProject2.git
+git clone git@github.com:Streiker-Saik/Jobs_HH.git
 ```
 - Перейдите в директорию проекта:
 ```
